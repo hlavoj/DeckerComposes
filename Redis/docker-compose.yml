@@ -1,0 +1,18 @@
+services:
+  redis:
+    container_name: my-redis-container
+    image: redis:latest
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - hlavoj-net
+
+volumes:
+  redis-data:
+  
+networks:
+  hlavoj-net:
+    external: true

@@ -1,0 +1,21 @@
+services:
+  mongodb:
+    container_name: my-mongodb-container
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: adminpassword
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+    restart: always
+    networks:
+      - hlavoj-net
+
+volumes:
+  mongodb-data:
+
+networks:
+  hlavoj-net:
+    external: true
