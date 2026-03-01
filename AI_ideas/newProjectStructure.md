@@ -186,6 +186,130 @@ have an updated `docs/` entry before it's "done". Bake this check into your
 
 ---
 
+## GitHub Copilot CLI — Comparison and Dual-Tool Structure
+
+> My earlier comparison was wrong. Copilot CLI is a full terminal agent with the same
+> core capabilities as Claude Code. Here is the accurate picture.
+
+### Feature Comparison
+
+| Feature | Claude Code | Copilot CLI |
+|---------|-------------|-------------|
+| Context file | `CLAUDE.md` (with `@import`) | `AGENTS.md` |
+| Sub-agents | `.claude/agents/*.md` (frontmatter) | `.agent.md` in plugin `agents/` |
+| Skills / commands | `.claude/commands/*.md` | `SKILL.md` directories in `skills/` |
+| MCP servers | `.mcp.json` | `.mcp.json` — **identical format** |
+| Hooks | `.claude/settings.json` hooks | `.github/hooks/*.json` |
+| Plan mode | Plan mode / `Shift+Tab` | `/plan` command / `Shift+Tab` |
+| Parallel agents | Background agents | `/fleet` command |
+| Multi-model | Claude only | GPT / Claude / Gemini via `/model` |
+| GitHub integration | Via GitHub MCP server | Native GitHub MCP server built-in |
+| Plugin bundle | No — flat directories | `plugin.json` bundles agents+skills+hooks+MCP |
+| Auto-memory | `~/.claude/projects/.../memory/` | No built-in equivalent |
+| `@import` in context file | Yes — pull docs into context | No — flat single file |
+
+Note: Skills can live in `.github/skills` **or** `.claude/skills` — deliberate
+cross-compatibility between the two tools.
+
+### Copilot CLI Project Structure
+
+```
+MyProject/
+├── AGENTS.md                         ← master context (≈ CLAUDE.md, no @import)
+├── .mcp.json                         ← identical format to Claude Code
+├── .github/
+│   ├── hooks/
+│   │   └── policy.json               ← lifecycle hooks (≈ .claude/settings.json hooks)
+│   └── copilot-instructions.md       ← VS Code Copilot context (separate from CLI)
+├── .copilot/
+│   └── my-plugin/
+│       ├── plugin.json               ← bundles agents + skills + MCP
+│       ├── agents/
+│       │   ├── backend.agent.md
+│       │   ├── frontend.agent.md
+│       │   ├── libs.agent.md
+│       │   ├── review-security.agent.md
+│       │   ├── deployment-engineer.agent.md
+│       │   └── docs-writer.agent.md
+│       ├── skills/
+│       │   ├── deploy-staging/SKILL.md
+│       │   ├── review-pr/SKILL.md
+│       │   └── sync-docs/SKILL.md
+│       └── .mcp.json
+├── backend/
+│   ├── AGENTS.md
+│   └── ...
+├── frontend/
+│   ├── AGENTS.md
+│   └── ...
+├── libs/
+│   ├── AGENTS.md
+│   └── ...
+└── docs/
+    ├── AGENTS.md
+    └── ...
+```
+
+### Agent file format (`.agent.md`) — nearly identical to Claude Code
+
+```markdown
+---
+name: backend-agent
+description: Implements features in the backend repo.
+tools: ["bash", "edit", "view"]
+---
+
+You are a backend specialist for MyProject...
+```
+
+### Plugin manifest (`plugin.json`) — Copilot's unique bundling mechanism
+
+```json
+{
+  "name": "myproject-agents",
+  "version": "1.0.0",
+  "agents": "agents/",
+  "skills": ["skills/"],
+  "hooks": "../.github/hooks/policy.json",
+  "mcpServers": ".mcp.json"
+}
+```
+
+### Real Differences
+
+**Copilot CLI advantages:**
+- Multi-model: switch between GPT-4.1, Claude, Gemini with `/model`
+- `/fleet`: explicit parallel execution with result convergence
+- Plugin system: bundle + version agents as a distributable package
+- Native GitHub MCP: issues, PRs, Actions built-in with no config
+- Enterprise SSO: company GitHub auth works out of the box
+
+**Claude Code advantages:**
+- `@import` in CLAUDE.md: pull docs content into context automatically
+- Auto-memory: cross-session persistence built-in
+- Simpler structure: no plugin manifest needed
+
+### Dual-Tool Setup (support both from one codebase)
+
+Since `.mcp.json` is identical and agent frontmatter is nearly the same, maintain both
+with minimal duplication:
+
+```
+MyProject/
+├── CLAUDE.md              ← Claude Code master context (with @imports)
+├── AGENTS.md              ← Copilot CLI master context (same content, flat)
+├── .mcp.json              ← shared by both tools, identical format
+├── .claude/
+│   └── agents/            ← Claude Code agents
+│       └── backend.md
+└── .copilot/
+    └── plugin/
+        └── agents/        ← Copilot CLI agents (same instructions, .agent.md extension)
+            └── backend.agent.md
+```
+
+---
+
 ## Summary Checklist
 
 - [ ] Workspace root repo created (`project-config`)
