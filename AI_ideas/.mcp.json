@@ -1,0 +1,47 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {}
+    },
+    "mssql": {
+      "type": "stdio",
+      "command": "C:\\Users\\hlavo\\.local\\bin\\uvx.exe",
+      "args": [
+        "mssql_mcp_server"
+      ],
+      "env": {
+        "MSSQL_SERVER": "localhost,1433",
+        "MSSQL_DATABASE": "ClaudeDb",
+        "MSSQL_USER": "sa",
+        "MSSQL_PASSWORD": "YourStrong@Passw0rd"
+      }
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
+    },
+    "fetch": {
+      "type": "stdio",
+      "command": "C:\\Users\\hlavo\\.local\\bin\\uvx.exe",
+      "args": [
+        "mcp-server-fetch"
+      ],
+      "env": {}
+    }
+  }
+}
